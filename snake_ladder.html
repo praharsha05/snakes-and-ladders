@@ -53,7 +53,7 @@ body {
   overflow:hidden;
   padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0);
 }
-.screen.hidden { opacity:0; pointer-events:none; transform:scale(0.97); }
+.screen.hidden { opacity:0; pointer-events:none; transform:scale(0.97); visibility:hidden; }
 
 /* ══════════════════════════════════════
    SCREEN 1 — INTRO
@@ -192,6 +192,21 @@ body {
   padding:12px 20px; min-height:48px;
 }
 .mode-back-btn:active { color:rgba(255,255,255,0.8); }
+
+/* ── Mode screen wallet pill ── */
+.mode-wallet {
+  display:flex; align-items:center; gap:8px;
+  padding:10px 20px; border-radius:50px;
+  background:rgba(245,197,24,0.08);
+  border:1px solid rgba(245,197,24,0.25);
+  font-family:'Orbitron',monospace;
+  font-size:clamp(11px,3vw,13px); font-weight:700;
+  color:var(--neon-gold);
+  letter-spacing:1px;
+  box-shadow:0 0 18px rgba(245,197,24,0.12);
+}
+.mode-wallet-icon { font-size:16px; }
+.mode-wallet-label { color:rgba(255,255,255,0.4); font-size:9px; letter-spacing:2px; margin-right:2px; }
 @media(hover:hover){ .mode-back-btn:hover { color:rgba(255,255,255,0.8); } }
 
 /* ══════════════════════════════════════
@@ -268,6 +283,225 @@ body {
 
 .board-svg   { position:absolute; top:8px; left:8px; pointer-events:none; z-index:3; }
 .token-layer { position:absolute; top:8px; left:8px; pointer-events:none; z-index:14; }
+
+/* ── Clickable snake/ladder items in Gen Alpha ── */
+.sl-clickable {
+  pointer-events: all;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.sl-clickable:hover .sl-hit-zone { opacity: 0.18; }
+.sl-clickable:active .sl-hit-zone { opacity: 0.32; }
+.sl-hit-zone {
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+/* Pulse ring on the active player's turn */
+.alpha-active .sl-clickable .sl-ring {
+  animation: sl-ring-pulse 1.8s ease-in-out infinite;
+}
+@keyframes sl-ring-pulse {
+  0%,100% { opacity:0; r:12px; }
+  50%      { opacity:0.55; r:18px; }
+}
+/* Owned item indicator dot */
+.sl-owned-dot {
+  pointer-events: none;
+}
+/* Item info tooltip bubble */
+#sl-tooltip {
+  position: fixed;
+  z-index: 999;
+  background: rgba(5,0,25,0.96);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 14px 18px;
+  min-width: 200px;
+  max-width: 260px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.7);
+  backdrop-filter: blur(20px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+  transition: opacity 0.18s, transform 0.18s;
+  font-family: 'Exo 2', sans-serif;
+}
+#sl-tooltip.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.sl-tt-type {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sl-tt-cells {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+.sl-tt-price {
+  font-size: 11px;
+  color: rgba(245,197,24,0.85);
+  margin-bottom: 8px;
+}
+.sl-tt-winner {
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: 700;
+}
+.sl-tt-action {
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 6px;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 1px;
+}
+/* Locked state when not your turn */
+.sl-locked .sl-clickable {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+/* Bid panel overlay */
+#inline-bid-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+#inline-bid-panel.show { display: flex; animation: fadeIn 0.22s ease; }
+.ibp-box {
+  background: linear-gradient(160deg, rgba(10,0,35,0.98), rgba(3,0,18,0.99));
+  border: 1px solid rgba(255,255,255,0.12);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 480px;
+  padding: 24px 24px 32px;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+}
+.ibp-handle {
+  width: 36px; height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+.ibp-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ibp-icon { font-size: 28px; }
+.ibp-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.ibp-cells {
+  font-size: 11px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 2px;
+  font-family: 'Orbitron', monospace;
+}
+.ibp-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(245,197,24,0.07);
+  border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+.ibp-price-label { font-size: 10px; color: rgba(255,255,255,0.4); letter-spacing: 1px; font-family:'Orbitron',monospace; }
+.ibp-price-val { font-family:'Orbitron',monospace; font-size:18px; font-weight:700; color: var(--neon-gold); }
+.ibp-balance { font-size:11px; color:rgba(255,255,255,0.4); }
+.ibp-input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.ibp-input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 14px 16px;
+  text-align: center;
+  outline: none;
+  -webkit-appearance: none;
+}
+.ibp-input:focus { border-color: rgba(105,255,71,0.5); }
+.ibp-btns {
+  display: flex;
+  gap: 10px;
+}
+.ibp-skip-btn {
+  flex: 1;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  min-height: 50px;
+}
+.ibp-bid-btn {
+  flex: 2;
+  font-family: 'Orbitron', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(105,255,71,0.25), rgba(0,229,255,0.2));
+  border: 1px solid rgba(105,255,71,0.5);
+  color: #69ff47;
+  cursor: pointer;
+  min-height: 50px;
+}
+.ibp-bid-btn:active { opacity: 0.8; transform: scale(0.98); }
+.ibp-winner-info {
+  background: rgba(245,197,24,0.08);
+  border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: rgba(245,197,24,0.85);
+  margin-bottom: 12px;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+.ibp-player-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  font-family: 'Orbitron', monospace;
+  text-align: center;
+  margin-bottom: 10px;
+}
 
 .token {
   position:absolute;
@@ -1566,16 +1800,10 @@ body {
   <h1 class="intro-title">Snake &amp; Ladder<br>Reimagined</h1>
   <p class="intro-sub">Roll. Climb. Survive. Win.</p>
   <!-- Wallet pill (shows total coins + per-player breakdown) -->
-  <div class="intro-wallet" id="intro-wallet" onclick="openCoinLedger()" title="Tap to view detailed coin wallet">
-    <div style="display:flex;align-items:center;gap:8px;width:100%;">
-      <span class="intro-wallet-icon">💰</span>
-      <div>
-        <span class="intro-wallet-label">COIN WALLET</span>
-        <span id="intro-wallet-total" style="font-size:14px;">—</span>
-      </div>
-      <span style="margin-left:auto;font-size:9px;color:rgba(245,197,24,0.35);font-family:'Exo 2',sans-serif;">TAP FOR DETAILS</span>
-    </div>
-    <div id="intro-wallet-players" class="intro-wallet-players" style="display:none;"></div>
+  <!-- Wallet pill hidden on intro screen — kept in DOM for JS compatibility -->
+  <div class="intro-wallet" id="intro-wallet" style="display:none!important;">
+    <div id="intro-wallet-total"></div>
+    <div id="intro-wallet-players"></div>
   </div>
   <div class="intro-action-row">
     <button class="play-btn" onclick="showScreen('mode')">▶ &nbsp;PLAY</button>
@@ -1626,6 +1854,12 @@ body {
     <div class="reward-preview-bar" id="reward-preview-bar">
       🏆 Win reward: <span id="reward-preview-amount">—</span> coins
     </div>
+  </div>
+
+  <div class="mode-wallet" id="mode-wallet" style="display:none;">
+    <span class="mode-wallet-icon">💰</span>
+    <span class="mode-wallet-label">YOUR COINS</span>
+    <span id="mode-wallet-amount">0</span>
   </div>
 
   <button class="mode-back-btn" onclick="showScreen('intro')">← Back</button>
@@ -1695,8 +1929,8 @@ body {
     <!-- hidden log — kept for JS compatibility, not rendered -->
     <div id="glog" style="display:none"></div>
 
-    <!-- GEN ALPHA: Individual Rank HUD -->
-    <div id="alpha-rank-hud"></div>
+    <!-- GEN ALPHA: Individual Rank HUD (hidden — removed per design) -->
+    <div id="alpha-rank-hud" style="display:none"></div>
 
   </div><!-- /bottom-panel -->
 </div><!-- /screen-game -->
@@ -1923,12 +2157,61 @@ function _baseShowScreen(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
   document.getElementById('screen-'+name).classList.remove('hidden');
   if(name==='game') { setTimeout(()=>computeBoardSize(), 30); }
+  // Always dismiss the matchmaking overlay on any screen transition
+  // (it is a floating overlay that must never bleed across navigation)
+  if(name !== 'game'){
+    _mmCancelled = true;
+    if(_mmTimeout){ clearTimeout(_mmTimeout); _mmTimeout = null; }
+    _mmPlayers = [];
+    // Use getElementById with null-check (element may not exist at page load)
+    const _mmEl = document.getElementById('matchmaking-overlay');
+    if(_mmEl) _mmEl.classList.remove('show');
+  }
 }
 
 function showScreen(name){
   _baseShowScreen(name);
   if(name === 'intro') updateIntroWallet();
   if(name === 'game') setTimeout(updateCoinHUD, 100);
+  if(name === 'mode') resetModeScreen();
+}
+
+function resetModeScreen(){
+  // Reset pendingMode to default
+  pendingMode = 'millennial';
+  _modeSelected = false; // require explicit mode selection before START GAME works
+  updateModeWallet();
+  // Clear any previously selected mode card highlights
+  document.querySelectorAll('.mode-card').forEach(c => {
+    c.style.borderColor = '';
+    c.style.boxShadow = '';
+    c.style.transform = '';
+    c.style.background = '';
+  });
+  // Reset start button to default state
+  const btn = document.getElementById('start-btn');
+  if(btn){
+    btn.classList.remove('genz-mode','alpha-mode');
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    btn.innerHTML = '🚀 START GAME';
+  }
+  // Reset player count label
+  const label = document.getElementById('pcount-label');
+  if(label) label.textContent = 'Number of Players';
+  // Collapse pcount-glass until a mode is explicitly chosen
+  const pcountGlass = document.querySelector('.pcount-glass');
+  if(pcountGlass){
+    pcountGlass.style.opacity = '0.45';
+    pcountGlass.style.transform = 'translateY(6px)';
+    pcountGlass.style.pointerEvents = 'none';
+  }
+  // Disable START GAME button until a mode is selected
+  const startBtn2 = document.getElementById('start-btn');
+  if(startBtn2){ startBtn2.disabled = true; startBtn2.style.pointerEvents = 'none'; }
+  // Reset player count selection to default (2)
+  selectCount(2);
 }
 
 function showComingSoon(el){ showToast('🚧 Coming Soon!', ''); }
@@ -1959,12 +2242,15 @@ function confirmExit(){
   const overlay = document.getElementById('exit-overlay');
   overlay.classList.remove('show','hide');
 
-  /* Reset game flags so a fresh game can be started */
+  /* Cancel any pending matchmaking search and hide its overlay */
+  closeMatchmaking();
+  _mmPlayers = [];
+
+  /* Reset game-state flags */
   busy = false;
   gameInitialized = false;
-  currentMode = 'millennial';
-  pendingMode = 'millennial';
   alphaState = null;
+  _lastLaunchedPlayers = [];
 
   /* Close win overlay if somehow open */
   document.getElementById('win-overlay').classList.remove('show');
@@ -1989,6 +2275,7 @@ document.addEventListener('keydown', function(e){
 
 function selectMode(mode){
   pendingMode = mode;
+  _modeSelected = true; // user has explicitly chosen a mode
   const btn = document.getElementById('start-btn');
   // Update button style
   if(mode === 'genz'){
@@ -2041,6 +2328,9 @@ function selectMode(mode){
     b.style.opacity = '1';
     b.style.pointerEvents = 'auto';
   });
+  // Re-enable START GAME button now that a mode is chosen
+  const startBtnEnable = document.getElementById('start-btn');
+  if(startBtnEnable){ startBtnEnable.disabled = false; startBtnEnable.style.pointerEvents = 'auto'; }
 
   // Re-apply selected count highlight
   selectCount(selectedCount);
@@ -2060,6 +2350,7 @@ function startGenZ(){
 }
 
 function startSelectedMode(){
+  if(!_modeSelected){ showToast('Please select a mode first!', ''); return; }
   if(pendingMode === 'genz') startGenZ();
   else if(pendingMode === 'genalpha') startGenAlpha();
   else startMillennial();
@@ -2112,6 +2403,21 @@ let busy = false;
 let gameInitialized = false;
 let selectedCount = 2;
 
+/* ── Restart consistency ─────────────────────────────────────────────
+   Stores the full player config (isRobo, colors, names) from the last
+   game launch so restartGame() can rebuild it identically — preserving
+   robo/human split, auto-play behavior, and turn-lock logic.
+   Fresh robo NAMES are still drawn each restart (variety); the SLOTS
+   (who is human, who is robo) stay the same.
+───────────────────────────────────────────────────────────────────── */
+let _lastLaunchedPlayers = [];   // set by every _launch* call
+let _lastLaunchedMode    = null; // currentMode at launch time
+let _modeSelected = false;       // true only after user explicitly picks a mode
+let _mmResolve = null;           // resolve fn for matchmaking promise
+let _mmTimeout = null;           // search timeout handle
+let _mmPlayers  = [];            // final player list after matchmaking
+let _mmCancelled = false;        // set true to abort an in-progress search
+
 const DMAP = {
   1:[[1,1]], 2:[[0,0],[2,2]], 3:[[0,0],[1,1],[2,2]],
   4:[[0,0],[0,2],[2,0],[2,2]],
@@ -2142,6 +2448,7 @@ function initGame(){
 function setupPlayers(count){
   currentMode = pendingMode;
   selectedCount = count;
+  _refreshRoboNames(); // fresh name pool every new game
   state.players = PLAYER_DEFS.slice(0, count).map(p=>({...p, pos:0}));
   // Load saved coin balances for all modes (display only in millennial/genz)
   const savedCoins = loadAllCoins();
@@ -3108,6 +3415,8 @@ function updateRollButtonState(){
       turnSub.textContent = 'Your turn — roll the dice!';
     }
   }
+  // Sync snake/ladder clickability with current turn
+  updateSlClickability();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -3141,6 +3450,12 @@ function applyMode(){
   if(currentMode === 'genz'){
     boardWrap.classList.add('genz-game');
     gameScreen.classList.add('genz-active');
+    activeSnakes  = randomizeBoard(state.players || []);
+    activeLadders = _lastGenZLadders;
+  } else if(currentMode === 'millennial'){
+    boardWrap.classList.remove('genz-game');
+    gameScreen.classList.remove('genz-active');
+    /* Dynamic layout: fresh random snakes & ladders each new game */
     activeSnakes  = randomizeBoard(state.players || []);
     activeLadders = _lastGenZLadders;
   } else {
@@ -3468,10 +3783,51 @@ function drawAllActive(){
   svg.appendChild(ladderLayer);
   svg.appendChild(snakeLayer);
 
-  Object.entries(activeLadders).forEach(([bot,top]) => drawLadder(ladderLayer, CC(+bot), CC(+top)));
-  Object.entries(activeSnakes).forEach(([head,tail], i) => {
-    drawSnake(snakeLayer, CC(+head), CC(+tail), SNAKE_PALETTES[i % SNAKE_PALETTES.length], i);
+  Object.entries(activeLadders).forEach(([bot,top]) => {
+    const B = CC(+bot), T = CC(+top);
+    const grp = mk('g', {
+      'class': 'sl-clickable',
+      'data-sl-type': 'ladder',
+      'data-sl-from': bot,
+      'data-sl-to': top,
+      style: 'pointer-events:none'  // toggled on/off via updateSlClickability
+    });
+    drawLadder(grp, B, T);
+    // Invisible fat hit-zone along the ladder spine
+    const mid = {x:(B.x+T.x)/2, y:(B.y+T.y)/2};
+    const hitLine = mk('line',{
+      x1:B.x, y1:B.y, x2:T.x, y2:T.y,
+      stroke:'rgba(105,255,71,0.0)', 'stroke-width':'28',
+      'stroke-linecap':'round', 'class':'sl-hit-zone'
+    });
+    grp.appendChild(hitLine);
+    ladderLayer.appendChild(grp);
   });
+
+  Object.entries(activeSnakes).forEach(([head,tail], i) => {
+    const grp = mk('g', {
+      'class': 'sl-clickable',
+      'data-sl-type': 'snake',
+      'data-sl-from': head,
+      'data-sl-to': tail,
+      style: 'pointer-events:none'
+    });
+    drawSnake(grp, CC(+head), CC(+tail), SNAKE_PALETTES[i % SNAKE_PALETTES.length], i);
+    // Invisible hit zone from head to tail
+    const H = CC(+head), Ta = CC(+tail);
+    const hitLine = mk('line',{
+      x1:H.x, y1:H.y, x2:Ta.x, y2:Ta.y,
+      stroke:'rgba(255,45,120,0.0)', 'stroke-width':'28',
+      'stroke-linecap':'round', 'class':'sl-hit-zone'
+    });
+    grp.appendChild(hitLine);
+    snakeLayer.appendChild(grp);
+  });
+
+  // Re-apply clickability based on current turn state
+  updateSlClickability();
+  // Re-attach click + hover listeners
+  attachSlListeners();
 }
 
 /**
@@ -3510,14 +3866,23 @@ async function triggerChaos(){
 
 /* ═══════════════════════════════════════════════════════
    CORE ROLL LOGIC
+   ─ rollDice()       → called by the human ROLL button;
+                        blocks if it's a robo's turn.
+   ─ _executeRoll()   → the actual roll engine; called by
+                        both rollDice() and maybeAutoRollRobo().
 ═══════════════════════════════════════════════════════ */
 async function rollDice(){
   if(busy) return;
 
-  // TURN LOCK: only allow rolling on the human player's turn
+  // Human-button guard: block clicks when it's a robo's turn
   const cur = state.players[state.currentPlayer];
   if(cur && cur.isRobo) return;
 
+  await _executeRoll();
+}
+
+async function _executeRoll(){
+  if(busy) return;
   busy=true;
   document.getElementById('rbtn').disabled=true;
 
@@ -3608,8 +3973,8 @@ async function rollDice(){
     busy=false;
     // Re-enable button only if it's still the human's turn
     updateRollButtonState();
-    // If robo rolled 6, auto-roll again
-    setTimeout(() => maybeAutoRollRobo(), 900 + Math.floor(Math.random() * 600));
+    // Robo gets another auto-roll; human waits for button press
+    setTimeout(() => maybeAutoRollRobo(), 600 + Math.floor(Math.random() * 500));
     return;
   }
 
@@ -3934,10 +4299,12 @@ function openDecideOverlay(bid, winnerName, resolve){
   const overlay = document.getElementById('alpha-decide-overlay');
   const origType = bid.type;
   const invertedType = origType === 'snake' ? 'ladder' : 'snake';
-  const origLabel = origType === 'snake' ? '🐍 Snake (slides down)' : '🪜 Ladder (climbs up)';
-  const invertLabel = invertedType === 'snake' ? '🐍 Acts as Snake' : '🪜 Acts as Ladder';
+  const origIcon    = origType    === 'snake' ? '🐍' : '🪜';
+  const invertIcon  = invertedType === 'snake' ? '🐍' : '🪜';
+  const origLabel   = origType    === 'snake' ? `${origIcon} Snake (slides down)`   : `${origIcon} Ladder (climbs up)`;
+  const invertLabel = invertedType === 'snake' ? `${invertIcon} Acts as Snake`        : `${invertIcon} Acts as Ladder`;
 
-  document.getElementById('alpha-decide-title').textContent = `${winnerName} wins the bid!`;
+  document.getElementById('alpha-decide-title').textContent = `You won the bid!`;
   document.getElementById('alpha-decide-info').textContent =
     `This ${bid.type} (${bid.from}→${bid.to}) is under your control. How should it behave?`;
   document.getElementById('alpha-keep-btn').textContent = `Keep: ${origLabel}`;
@@ -3992,23 +4359,36 @@ function openRevealOverlay(actedAsType, winnerName, item, resolve){
   const overlay = document.getElementById('alpha-reveal-overlay');
   const box = document.getElementById('alpha-reveal-box');
   const isSnakeEffect = actedAsType === 'snake';
+  const isOriginallySnake = item.type === 'snake';
+  const isReversed = (isSnakeEffect !== isOriginallySnake);
+
   box.style.border = isSnakeEffect
     ? '2px solid rgba(255,45,120,0.6)'
     : '2px solid rgba(105,255,71,0.5)';
+
   document.getElementById('alpha-reveal-icon').textContent = isSnakeEffect ? '🐍' : '🪜';
+
   document.getElementById('alpha-reveal-title').innerHTML = isSnakeEffect
     ? `<span style="color:#ff2d78">Acted as a SNAKE!</span>`
     : `<span style="color:#69ff47">Acted as a LADDER!</span>`;
-  if(winnerName){
-    const wp = state.players.find(p => p.name === winnerName);
-    const col = wp ? wp.color : '#f5c518';
-    document.getElementById('alpha-reveal-owner').innerHTML = `Controlled by: <span style="color:${col};font-weight:700">${winnerName}</span>`;
+
+  // HIDDEN BIDDING: never reveal owner — only show controlled/uncontrolled
+  document.getElementById('alpha-reveal-owner').innerHTML = winnerName
+    ? `<span style="color:rgba(105,255,71,0.8);">🔒 Controlled</span>`
+    : `<span style="color:rgba(255,255,255,0.35);">⚪ Uncontrolled — default behavior</span>`;
+
+  // Direction label matches actual movement
+  let moveLabel;
+  if(isSnakeEffect){
+    moveLabel = isReversed
+      ? `Cell ${item.from} — sliding BACK (reversed ladder!)`
+      : `Cell ${item.from}→${item.to} — Player slides DOWN!`;
   } else {
-    document.getElementById('alpha-reveal-owner').textContent = 'No bidder — default behavior';
+    moveLabel = isReversed
+      ? `Cell ${item.from} — climbing FORWARD (reversed snake!)`
+      : `Cell ${item.from}→${item.to} — Player climbs UP!`;
   }
-  document.getElementById('alpha-reveal-msg').textContent = isSnakeEffect
-    ? `Cell ${item.from}→${item.to} — Player slides DOWN!`
-    : `Cell ${item.from}→${item.to} — Player climbs UP!`;
+  document.getElementById('alpha-reveal-msg').textContent = moveLabel;
   overlay.style.display = 'flex';
 }
 
@@ -4036,8 +4416,8 @@ function openRebidding(){
     card.className = `alpha-item-card ${bid.type}-item`;
     const typeColor = bid.type === 'snake' ? '#ff2d78' : '#69ff47';
     const winnerInfo = bid.winner
-      ? `<span style="color:rgba(245,197,24,0.8);">🏆 ${bid.winner} (💰${bid.currentPrice})</span>`
-      : `<span style="color:rgba(255,255,255,0.3);">No winner yet</span>`;
+      ? `<span style="color:rgba(105,255,71,0.8);">🔒 Controlled · floor: 💰${bid.currentPrice}</span>`
+      : `<span style="color:rgba(255,255,255,0.3);">⚪ Uncontrolled · base: 💰${bid.basePrice}</span>`;
     card.innerHTML = `
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
         <input type="checkbox" data-key="${key}" style="width:16px;height:16px;accent-color:#69ff47;cursor:pointer;">
@@ -4068,9 +4448,7 @@ function closeRebidOverlay(doRebid){
   busy = true;
   document.getElementById('rbtn').disabled = true;
 
-  startPrivateBidRound(true, selectedKeys, async (bidsCollected) => {
-    applyBidsToState(bidsCollected, true);
-    await _resolveDecisionsWithRobos(bidsCollected);
+  _openInlineBid(selectedKeys, () => {
     showToast('🔄 Rebids applied! Behavior updated!', 'gold');
     renderPlayers();
     updateAlphaRankHUD();
@@ -4095,7 +4473,6 @@ function updateAlphaRankHUD(){
       <div class="alpha-rank-dot" style="background:${p.color};box-shadow:0 0 5px ${p.color};"></div>
       <div>
         <div class="alpha-rank-name" style="color:${p.color}">${p.name}${isSpec ? ' ⭐' : ''}</div>
-        <div class="alpha-rank-coins">💰${p.coins}</div>
       </div>
       <div class="alpha-rank-pos">${p.pos < 1 ? 'Start' : p.pos >= 100 ? '✅' : p.pos + '/100'}</div>
     `;
@@ -4123,13 +4500,14 @@ function startGenAlpha(){
   pendingMode = 'genalpha';
   // Clamp player count to max 4 for Gen Alpha
   if(selectedCount > 4) selectCount(4);
-  showScreen('game');
-  if(!gameInitialized){ initGame(); } else { setupPlayersAlpha(selectedCount); }
+  // Go through matchmaking just like other modes — skip the handoff/bid screens until after lobby
+  openMatchmaking(selectedCount, 'genalpha');
 }
 
 function setupPlayersAlpha(count){
   currentMode = pendingMode;
   selectedCount = count;
+  _refreshRoboNames(); // fresh name pool every new game
 
   const actualCount = Math.min(count, 4); // hard limit for Gen Alpha
   state.players = PLAYER_DEFS.slice(0, actualCount).map(p => ({...p, pos: 0}));
@@ -4179,6 +4557,8 @@ function setupPlayersAlpha(count){
     renderDice(1);
     addLog(`🎮 Game started — ${state.players[0].name} goes first!`);
     updateRollButtonState();
+    // Kick off auto-play if first player happens to be a robo
+    setTimeout(() => maybeAutoRollRobo(), 800);
   }
 }
 
@@ -4191,11 +4571,37 @@ function initGame(){
   setupPlayersAlpha(selectedCount);
 }
 
-/* Override restartGame */
+/* Override restartGame — rebuilds the exact same robo/human split
+   preserving all player names (including robos) so the same opponent
+   continues into the new game rather than getting a brand-new identity.   */
 function restartGame(){
-  pendingMode = currentMode;
+  pendingMode = _lastLaunchedMode || currentMode;
   if(currentMode === 'genalpha') alphaState = null;
-  setupPlayersAlpha(selectedCount);
+
+  if(_lastLaunchedPlayers.length === 0){
+    // Fallback: no saved config yet (shouldn't happen in normal flow)
+    setupPlayersAlpha(selectedCount);
+    return;
+  }
+
+  // Rebuild player list: ALL players keep their name and identity across restarts
+  const rebuilt = _lastLaunchedPlayers.map(p => {
+    const savedCoins = loadAllCoins();
+    return {
+      ...p,
+      pos: 0,
+      coins: pendingMode === 'genalpha'
+        ? (savedCoins[p.name] || p.coins || 200)
+        : (savedCoins[p.name] || 0),
+    };
+  });
+
+  // Route to the right launcher — keeps all game mechanics consistent
+  if(pendingMode === 'genalpha'){
+    _launchAlphaWithPlayers(rebuilt);
+  } else {
+    _launchStandardWithPlayers(rebuilt);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -4219,6 +4625,7 @@ function nextTurn(){
   } else {
     state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
   }
+  resetTurnBidFlag(); // reset one-bid-per-turn restriction on every turn change
   renderPlayers();
   updateRollButtonState();
   // Auto-roll for robo players with a natural delay
@@ -4237,8 +4644,8 @@ function renderPlayers(){
 
   state.players.forEach((p, i) => {
     const isSpectator = currentMode === 'genalpha' && p.pos >= 100;
-    // p.coins is always populated from storage on init for all modes
-    const coinDisplay = `<div class="pc-coins">💰${p.coins !== undefined ? p.coins : 0}</div>`;
+    // Never show coins below player names — hidden bidding requires secrecy
+    const coinDisplay = '';
 
     const chip = document.createElement('div');
     chip.className = 'player-chip' + (i === cur ? ' active' : '') + (isSpectator ? ' spectator-chip' : '');
@@ -4292,18 +4699,27 @@ function renderPlayers(){
 
 /* ══════════════════════════════════════════════════════════
    CORE ROLL DICE — Gen Alpha behavior
+   rollDice()         → human-button entry; blocks robo turns
+   _executeRollAlpha()→ actual engine; called by maybeAutoRollRobo too
 ══════════════════════════════════════════════════════════ */
 async function rollDice(){
-  if(currentMode !== 'genalpha') return _origRollDiceGenAlpha();
+  if(currentMode !== 'genalpha') return _executeRoll();
 
   if(busy) return;
 
-  // TURN LOCK: only allow rolling on the human player's turn
+  // Human-button guard: block clicks when it's a robo's turn
   const curPlayer = state.players[state.currentPlayer];
   if(curPlayer && curPlayer.isRobo) return;
 
+  await _executeRollAlpha();
+}
+
+async function _executeRollAlpha(){
+  if(busy) return;
+
   busy = true;
   document.getElementById('rbtn').disabled = true;
+  updateSlClickability(); // lock snake/ladder clicks during roll
 
   const diceEl = document.getElementById('dice');
   diceEl.classList.add('rolling');
@@ -4354,51 +4770,59 @@ async function rollDice(){
 
   if(hitKey && hitBid){
     const { effectiveType, winner } = alphaGetBehavior(hitKey);
-    const originalTo = hitBid.to;
-    const originalFrom = hitBid.from;
+    const originalFrom = hitBid.from; // snake head / ladder bottom
+    const originalTo   = hitBid.to;   // snake tail / ladder top
 
-    /* ── Role Reveal Logic per spec ──
-       SNAKE at head (isSnakeCell): → down = snake, stays = ladder
-       SNAKE at tail (not applicable since we only land at head/bottom)
-       LADDER at bottom (isLadderCell): → up = ladder, stays = snake
-       LADDER at top (not applicable since we only land at bottom/head)
-    */
-    let dest = null;
+    // Distance of the original snake/ladder
+    const distance = Math.abs(originalTo - originalFrom);
+
+    let dest    = null;
     let actedAs = effectiveType;
+    let logVerb = '';
 
     if(isSnakeCell){
-      // Player is at snake head
+      // Player landed on snake HEAD (originalFrom)
       if(effectiveType === 'snake'){
-        dest = originalTo;  // moves down — acting as Snake
+        // Normal snake behaviour — slide DOWN to tail
+        dest    = originalTo;             // originalTo < originalFrom
         actedAs = 'snake';
+        logVerb = 'slides down';
       } else {
-        dest = null;         // stays — acting as Ladder (no movement upward, just neutral)
+        // Reversed: snake acts as ladder — move FORWARD by the snake's distance
+        dest    = Math.min(100, originalFrom + distance);
         actedAs = 'ladder';
+        logVerb = 'climbs up (reversed snake!)';
       }
     } else if(isLadderCell){
-      // Player is at ladder bottom
+      // Player landed on ladder BOTTOM (originalFrom)
       if(effectiveType === 'ladder'){
-        dest = originalTo;  // moves up — acting as Ladder
+        // Normal ladder behaviour — climb UP to top
+        dest    = originalTo;             // originalTo > originalFrom
         actedAs = 'ladder';
+        logVerb = 'climbs up';
       } else {
-        dest = null;         // stays — acting as Snake (no downward movement since at bottom)
+        // Reversed: ladder acts as snake — move BACKWARD by the ladder's distance
+        dest    = Math.max(1, originalFrom - distance);
         actedAs = 'snake';
+        logVerb = 'slides back (reversed ladder!)';
       }
     }
 
-    // Show reveal overlay
-    await new Promise(res => openRevealOverlay(actedAs, winner, hitBid, res));
+    // Show reveal overlay only when this item has been bid on
+    if(winner){
+      await new Promise(res => openRevealOverlay(actedAs, winner, hitBid, res));
+    }
 
-    if(dest !== null){
-      addLog(`${actedAs === 'snake' ? '🐍' : '🪜'} <b style="color:${p.color}">${p.name}</b> ${actedAs === 'snake' ? 'slides' : 'climbs'} ${p.pos}→${dest}`, actedAs);
+    if(dest !== null && dest !== p.pos){
+      addLog(
+        `${actedAs === 'snake' ? '🐍' : '🪜'} <b style="color:${p.color}">${p.name}</b> ${logVerb} ${p.pos}→${dest}`,
+        actedAs
+      );
       playSound(actedAs);
       await showFunnyAnim(actedAs, p.name, p.color, p.pos, dest);
       p.pos = dest;
       placeToken(cur, dest);
       flashCell(dest, 900);
-    } else {
-      addLog(`🎭 <b style="color:${p.color}">${p.name}</b> stays at ${p.pos} (reversed behavior — no move!)`, '');
-      showToast(`🎭 Reversed! ${p.name} stays put!`, 'gold');
     }
   }
 
@@ -4458,97 +4882,9 @@ async function rollDice(){
   nextTurn();
 }
 
-/* Fallback for non-alpha modes (millennial/genz original logic) */
-async function _origRollDiceGenAlpha(){
-  if(busy) return;
-
-  // TURN LOCK: only allow rolling on the human player's turn
-  const curPlayer = state.players[state.currentPlayer];
-  if(curPlayer && curPlayer.isRobo) return;
-
-  busy = true;
-  document.getElementById('rbtn').disabled = true;
-
-  if(currentMode === 'genz'){
-    await triggerChaos();
-    showToast('⚡ Board Reshuffled!', 'chaos-t');
-    addLog(`⚡ <span style="color:#ff3d71;font-weight:800">CHAOS!</span> Snakes &amp; Ladders repositioned!`, '');
-    await delay(200);
-  }
-
-  const diceEl = document.getElementById('dice');
-  diceEl.classList.add('rolling');
-  const anim = setInterval(() => renderDice(Math.floor(Math.random() * 6) + 1), 50);
-  playSound('dice');
-  await delay(520);
-  clearInterval(anim);
-  diceEl.classList.remove('rolling');
-
-  const roll = Math.floor(Math.random() * 6) + 1;
-  state.diceValue = roll;
-  renderDice(roll);
-
-  const cur = state.currentPlayer;
-  const p = state.players[cur];
-  const from = Math.max(0, p.pos);
-  const raw = from + roll;
-  addLog(`<b style="color:${p.color}">${p.name}</b> rolled <b>${roll}</b>`);
-
-  if(raw > 100){
-    addLog(`${p.name} needs exactly ${100 - from} — no move!`);
-    showToast(`Needs ${100 - from} to win!`, '');
-    busy = false; nextTurn(); return;
-  }
-
-  for(let s = 1; s <= roll; s++){
-    p.pos = from + s;
-    placeToken(cur, p.pos);
-    flashCell(p.pos, 150);
-    await delay(110);
-  }
-
-  if(activeSnakes[p.pos]){
-    const from2 = p.pos, dest = activeSnakes[p.pos];
-    addLog(`🐍 Snake! <b style="color:${p.color}">${p.name}</b> slides ${from2}→${dest}`, 'snake');
-    showToast('🐍 Bitten by a Snake!', 'snake-t');
-    playSound('snake');
-    await showFunnyAnim('snake', p.name, p.color, from2, dest);
-    p.pos = dest; placeToken(cur, dest); flashCell(dest, 900);
-  } else if(activeLadders[p.pos]){
-    const from2 = p.pos, dest = activeLadders[p.pos];
-    addLog(`🪜 Ladder! <b style="color:${p.color}">${p.name}</b> climbs ${from2}→${dest}`, 'ladder');
-    showToast('🪜 Climbed a Ladder!', 'ladder-t');
-    playSound('ladder');
-    await showFunnyAnim('ladder', p.name, p.color, from2, dest);
-    p.pos = dest; placeToken(cur, dest); flashCell(dest, 900);
-  }
-
-  renderPlayers();
-
-  if(p.pos >= 100){
-    addLog(`🏆 ${p.name} wins!`, 'win');
-    playSound('win');
-    document.getElementById('wtitle').textContent = p.name + ' Wins!';
-    document.getElementById('wsub').textContent = 'Reached 100 — Champion of the board!';
-    document.getElementById('win-overlay').classList.add('show');
-    busy = false; return;
-  }
-
-  if(roll === 6){
-    await delay(350);
-    addLog(`🎲 Rolled a 6! <b style="color:${p.color}">${p.name}</b> plays again!`, 'six');
-    showToast('🎲 Rolled a 6! Play Again!', 'gold');
-    busy = false;
-    updateRollButtonState();
-    // If robo rolled 6, auto-roll again
-    setTimeout(() => maybeAutoRollRobo(), 900 + Math.floor(Math.random() * 600));
-    return;
-  }
-
-  await delay(280);
-  busy = false;
-  nextTurn();
-}
+/* _origRollDiceGenAlpha is now superseded by _executeRoll (defined earlier).
+   Kept as a no-op alias so any stray references don't throw. */
+async function _origRollDiceGenAlpha(){ return _executeRoll(); }
 
 
 /* ═══════════════════════════════════════════════════════
@@ -4655,6 +4991,20 @@ function flashCoinPill(){
   pill.classList.add('coin-earned');
 }
 
+function updateModeWallet(){
+  const el = document.getElementById('mode-wallet-amount');
+  const pill = document.getElementById('mode-wallet');
+  if(!el || !pill) return;
+  const all = loadAllCoins();
+  const total = Object.values(all).reduce((s, v) => s + (v || 0), 0);
+  if(total > 0){
+    el.textContent = total;
+    pill.style.display = 'flex';
+  } else {
+    pill.style.display = 'none';
+  }
+}
+
 function updateIntroWallet(){
   const el = document.getElementById('intro-wallet-total');
   const wallet = document.getElementById('intro-wallet');
@@ -4720,8 +5070,58 @@ function updateRewardPreview(){
    No advantage, no disadvantage. Pure random fair play.
 ══════════════════════════════════════════════════════════════════ */
 
-// Robo names pool — natural, human-like names (no robot vibes)
-const ROBO_NAMES = ['Arjun','Priya','Kiran','Zara','Ravi','Meera','Dev','Nadia','Sasha','Leo','Aiden','Maya'];
+// ── ROBO NAME ENGINE ────────────────────────────────────────────────────────
+// Large, diverse pool: Indian names · global names · gamer handles
+// Mixed styles keep every game feeling fresh and different.
+const ROBO_NAME_POOL = [
+  // Indian — common & recognisable
+  'Aarav','Ananya','Arjun','Avni','Devansh','Diya','Ishaan','Ishita',
+  'Kabir','Kavya','Kiran','Krishiv','Manav','Meera','Mihir','Neha',
+  'Nikhil','Nisha','Priya','Rahul','Ravi','Reya','Rohan','Ruhi',
+  'Sahil','Sara','Shreya','Siddharth','Simran','Tanvi','Vikram','Vivaan',
+  'Yash','Zara','Aditya','Aisha','Aksh','Amara','Arnav','Ayaan',
+  // Global — naturally readable
+  'Aiden','Alex','Aria','Blake','Caleb','Chloe','Dylan','Elena',
+  'Ethan','Finn','Grace','Harper','Ivan','Jade','Kai','Layla',
+  'Lena','Leo','Liam','Luna','Maya','Miles','Mia','Nadia',
+  'Noah','Nova','Oliver','Olivia','Riley','Ryan','Sasha','Sofia',
+  'Theo','Zoe','Amber','Axel','Brooke','Cole','Dana','Eve',
+  // Gamer handles — punchy, memorable
+  'ArcaneAce','BlazeRunner','CyberKnight','DarkStar','EchoFox',
+  'FrostByte','GhostRider','HyperLink','IronClad','JoltX',
+  'KryptoKing','LunarWolf','MysticRider','NeonViper','OmegaStrike',
+  'PixelPunk','QuantumQ','RiftWalker','ShadowFox','TurboZen',
+  'UltraSync','VoidHawk','WarpSpeed','XenonX','ZeroG',
+];
+
+// Returns a fresh shuffled copy — call once per game to get a unique queue
+function _shuffleRoboPool(){
+  const arr = [...ROBO_NAME_POOL];
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Per-game name queue — replenished at game start; guarantees no in-game repeats
+let _roboNameQueue = [];
+
+function _nextRoboName(usedNames = []){
+  // Rebuild queue if empty
+  if(_roboNameQueue.length === 0) _roboNameQueue = _shuffleRoboPool();
+  // Skip any name already in use this game
+  let attempts = 0;
+  while(attempts++ < _roboNameQueue.length){
+    const name = _roboNameQueue.shift();
+    if(!usedNames.includes(name)) return name;
+  }
+  // Absolute fallback (pool exhausted — extremely unlikely with 100+ names)
+  return 'Player' + Math.floor(Math.random() * 9000 + 1000);
+}
+
+// Refresh the queue at the start of every game so names rotate across games
+function _refreshRoboNames(){ _roboNameQueue = _shuffleRoboPool(); }
 
 // Mark a player definition as robo
 function makeRoboDef(playerDef, roboName){
@@ -4734,12 +5134,87 @@ async function maybeAutoRollRobo(){
   if(!cur || !cur.isRobo) return false;
   if(busy) return false;
 
-  // Small human-like delay before rolling (already partially handled by nextTurn setTimeout)
+  // Natural human-like pause before the robo acts
   await delay(300 + Math.floor(Math.random() * 500));
 
-  // Trigger the roll
-  await rollDice();
+  // Re-check: turn may have changed or game may have ended during the delay
+  const cur2 = state.players[state.currentPlayer];
+  if(!cur2 || !cur2.isRobo || busy) return false;
+
+  // ── Gen Alpha: robo considers bidding before rolling ──
+  if(currentMode === 'genalpha' && alphaState && alphaState.initialBiddingDone && !_turnBidUsed){
+    await _roboConsiderBid(cur2);
+  }
+
+  // Use the internal executor -- bypasses the human-only guard in rollDice()
+  if(currentMode === 'genalpha'){
+    await _executeRollAlpha();
+  } else {
+    await _executeRoll();
+  }
   return true;
+}
+
+/* Robo evaluates all available snakes/ladders and optionally places one bid.
+   Mirrors the one-bid-per-turn rule. Runs silently — no UI shown. */
+async function _roboConsiderBid(robo){
+  if(!alphaState || !robo || robo.coins <= 0) return;
+
+  // Build list of biddable items (robo can afford the floor price)
+  const candidates = Object.entries(alphaState.bids).filter(([key, bid]) => {
+    return bid.currentPrice <= robo.coins;
+  });
+
+  if(candidates.length === 0) return;
+
+  // 50% chance the robo skips bidding this turn (feels natural, not robotic)
+  if(Math.random() < 0.5) return;
+
+  // Score each item — prefer high-value, uncontrolled items
+  const scored = candidates.map(([key, bid]) => {
+    const distance = Math.abs(bid.to - bid.from);
+    const isSnake  = bid.type === 'snake';
+    // Snakes are strategically more valuable (can set traps)
+    const typeBonus = isSnake ? 1.3 : 1.0;
+    // Prefer uncontrolled items (easier to win)
+    const controlPenalty = bid.winner ? 0.6 : 1.0;
+    const score = distance * typeBonus * controlPenalty * Math.random();
+    return { key, bid, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  const { key, bid } = scored[0];
+
+  // Decide bid amount — between floor and floor + 20% of coins, capped at coins
+  const minAmt = bid.currentPrice;
+  const maxAmt = Math.min(robo.coins, Math.floor(bid.currentPrice + robo.coins * 0.2));
+  if(maxAmt < minAmt) return;
+
+  const amount = minAmt + Math.floor(Math.random() * (maxAmt - minAmt + 1));
+
+  // Place the bid silently
+  robo.coins = Math.max(0, robo.coins - amount);
+  bid.winner       = robo.name;
+  bid.winnerBid    = amount;
+  bid.currentPrice = amount;
+  bid.biddingComplete = true;
+  // Robo randomly keeps or inverts
+  bid.inverted = roboDecideInvert();
+
+  _turnBidUsed = true;
+
+  const behaviorLabel = bid.inverted
+    ? (bid.type === 'snake' ? '🪜 acts as Ladder' : '🐍 acts as Snake')
+    : (bid.type === 'snake' ? '🐍 acts as Snake'  : '🪜 acts as Ladder');
+
+  addLog(`🤖 <b style="color:${robo.color}">${robo.name}</b> placed a secret bid on ${bid.type} ${bid.from}→${bid.to}`);
+
+  // Brief dramatic pause so players notice something happened
+  await delay(400 + Math.floor(Math.random() * 300));
+
+  renderPlayers();
+  updateAlphaRankHUD();
+  updateSlClickability();
 }
 
 // For Gen Alpha robo bidding: bid a random small amount on a few items
@@ -4778,9 +5253,7 @@ function roboDecideInvert(){
    MATCHMAKING SYSTEM
 ══════════════════════════════════════════════════════════════════ */
 
-let _mmResolve = null;      // resolve fn for matchmaking promise
-let _mmTimeout = null;      // search timeout handle
-let _mmPlayers  = [];       // final player list after matchmaking
+// _mmTimeout, _mmPlayers, _mmResolve declared above
 
 // Coin tiers for Gen Alpha matchmaking
 const ALPHA_TIERS = [
@@ -4813,7 +5286,8 @@ function buildMatchedPlayers(count, mode){
     } else {
       // Other slots: in a real server scenario these would be real players.
       // Here we fill with robos that have coin balances matching the mode/tier.
-      const roboName = ROBO_NAMES[(i - 1) % ROBO_NAMES.length];
+      const usedNames = players.map(p => p.name);
+      const roboName = _nextRoboName(usedNames);
       let roboCoins = 0;
 
       if(mode === 'genalpha'){
@@ -4846,6 +5320,7 @@ function buildMatchedPlayers(count, mode){
 // Open matchmaking overlay and simulate player search
 function openMatchmaking(count, mode){
   _mmPlayers = [];
+  _mmCancelled = false;   // reset cancellation flag for this new search
   const overlay = document.getElementById('matchmaking-overlay');
   const slotsEl = document.getElementById('mm-slots');
   const searchEl = document.getElementById('mm-searching');
@@ -4905,28 +5380,40 @@ function openMatchmaking(count, mode){
   searchEl.style.display = 'flex';
   overlay.classList.add('show');
 
-  // Simulate search: fill slots one by one with robo players
-  // In a real server: this would wait for real players to join
+  // Seed _mmPlayers with the human slot (P1) so name-dedup works from the start
+  const savedCoinsForMM = loadAllCoins();
+  _mmPlayers = [{
+    ...PLAYER_DEFS[0],
+    pos: 0,
+    isRobo: false,
+    coins: savedCoinsForMM['P1'] || 0,
+  }];
+
+  // Simulate search: fill slots one by one with robo players.
+  // IMPORTANT: names are assigned HERE (in the UI loop) and stored directly
+  // into _mmPlayers so the displayed name and the in-game name are always the same.
   let filled = 0;
   const tier = mode === 'genalpha' ? getAlphaMatchTier() : null;
   const p1CoinsVal = savedCoins['P1'] || 200;
 
   function fillNextSlot(){
+    if(_mmCancelled) return;   // search was aborted — do nothing
     if(filled >= slotEls.length){
-      // All slots filled — show start button
+      // All slots filled — show start button.
+      // _mmPlayers is already complete; no second name-draw needed.
       searchEl.style.display = 'none';
       startBtn.style.display = 'block';
       startBtn.textContent = `🚀 START GAME (${count} Players)`;
-
-      // Build final player list
-      _mmPlayers = buildMatchedPlayers(count, mode);
       return;
     }
 
     const { el, def, idx } = slotEls[filled];
-    const roboName = ROBO_NAMES[(idx - 1) % ROBO_NAMES.length];
-    let roboCoins = 0;
 
+    // Draw the name once and store it immediately into _mmPlayers
+    const usedSoFar = _mmPlayers.map(p => p.name);
+    const roboName = _nextRoboName(usedSoFar);
+
+    let roboCoins = 0;
     if(mode === 'genalpha' && tier){
       const variance = Math.floor(p1CoinsVal * 0.2);
       roboCoins = Math.max(tier.min,
@@ -4935,6 +5422,16 @@ function openMatchmaking(count, mode){
       roboCoins = Math.max(200, roboCoins);
     }
 
+    // Commit this robo to _mmPlayers right now — same name as shown in UI
+    _mmPlayers.push({
+      ...def,
+      name: roboName,
+      pos: 0,
+      isRobo: true,
+      coins: roboCoins,
+    });
+
+    // Update the slot UI to show the assigned name
     el.className = 'mm-slot filled-robo';
     el.innerHTML = `
       <div class="mm-slot-dot" style="background:${def.color};box-shadow:0 0 6px ${def.color};"></div>
@@ -4955,29 +5452,39 @@ function openMatchmaking(count, mode){
 }
 
 function closeMatchmaking(){
+  _mmCancelled = true;   // stop any in-flight fillNextSlot callbacks
   if(_mmTimeout) clearTimeout(_mmTimeout);
-  document.getElementById('matchmaking-overlay').classList.remove('show');
-  _mmPlayers = [];
+  _mmTimeout = null;
+  const _mmEl = document.getElementById('matchmaking-overlay');
+  if(_mmEl) _mmEl.classList.remove('show');
+  // NOTE: _mmPlayers is intentionally NOT cleared here.
+  // confirmMatchmaking() needs it intact to launch with the correct names.
+  // It is only wiped at the START of openMatchmaking (fresh search).
 }
 
 function confirmMatchmaking(){
+  // Snapshot the list BEFORE closing (closeMatchmaking no longer wipes it,
+  // but we snapshot here for clarity and forward-safety).
+  const playersToLaunch = _mmPlayers.length > 0
+    ? _mmPlayers.slice()                              // use exactly what the UI showed
+    : buildMatchedPlayers(selectedCount, pendingMode); // safety fallback only
+
   closeMatchmaking();
 
-  // Use the pre-built matched player list
-  if(_mmPlayers.length === 0){
-    _mmPlayers = buildMatchedPlayers(selectedCount, pendingMode);
-  }
-
-  // Launch the game with matched players
+  // Launch with the snapshotted list — robo names are identical to the lobby
   if(pendingMode === 'genalpha'){
-    _launchAlphaWithPlayers(_mmPlayers);
+    _launchAlphaWithPlayers(playersToLaunch);
   } else {
-    _launchStandardWithPlayers(_mmPlayers);
+    _launchStandardWithPlayers(playersToLaunch);
   }
 }
 
 // Launch standard game (millennial/genz) with a given player list
 function _launchStandardWithPlayers(players){
+  // Persist the full player config for restart consistency
+  _lastLaunchedPlayers = players.map(p => ({...p}));
+  _lastLaunchedMode    = pendingMode;
+
   showScreen('game');
   if(!gameInitialized){
     gameInitialized = true;
@@ -5010,6 +5517,10 @@ function _launchStandardWithPlayers(players){
 
 // Launch Gen Alpha game with a given player list
 function _launchAlphaWithPlayers(players){
+  // Persist the full player config for restart consistency
+  _lastLaunchedPlayers = players.map(p => ({...p}));
+  _lastLaunchedMode    = 'genalpha';
+
   pendingMode = 'genalpha';
   showScreen('game');
   if(!gameInitialized){
@@ -5034,22 +5545,13 @@ function _launchAlphaWithPlayers(players){
   renderPlayers();
   renderDice(1);
   updateAlphaRankHUD();
-  document.getElementById('rbtn').disabled = true;
-  addLog(`🤖 GEN α started — Secret bidding phase!`);
-
-  // Run bidding — skip robo players in the UI (auto-bid for them)
-  _runAlphaBiddingWithRobos(false, null, async (bidsCollected) => {
-    applyBidsToState(bidsCollected, false);
-    await _resolveDecisionsWithRobos(bidsCollected);
-    state.players.forEach(p => addPlayerCoins(p.isRobo ? p.name : p.name, 0));
-    alphaState.initialBiddingDone = true;
-    showToast('🎮 Bidding done! Behavior hidden until interaction!', 'gold');
-    addLog(`🎮 Bidding complete — ${state.players[0].name} goes first!`);
-    renderPlayers();
-    updateAlphaRankHUD();
-    updateRollButtonState();
-    setTimeout(() => maybeAutoRollRobo(), 800);
-  });
+  // No pre-game bidding — bidding happens inline during turns
+  alphaState.initialBiddingDone = true;
+  resetTurnBidFlag(); // fresh start — first player hasn't bid yet
+  addLog(`🤖 GEN α — ${state.players[0].name} goes first! Bid when you land!`);
+  document.getElementById('rbtn').disabled = false;
+  updateRollButtonState();
+  setTimeout(() => maybeAutoRollRobo(), 800);
 }
 
 /* Bidding round that skips UI for robo players */
@@ -5120,6 +5622,268 @@ async function _resolveDecisionsWithRobos(bidsCollected){
   }
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   SNAKE/LADDER INTERACTIVITY — Gen Alpha mode
+   • updateSlClickability() — called after every turn change
+   • attachSlListeners()    — called after every drawAllActive()
+   • showSlTooltip / hideSlTooltip — hover info bubble
+   • openInlineBidPanel / ibpSkip / ibpConfirm — tap-to-bid flow
+══════════════════════════════════════════════════════════════════ */
+
+/* Enable or disable pointer events on all sl-clickable groups */
+function updateSlClickability(){
+  if(currentMode !== 'genalpha'){ return; }
+  const cur = state.players[state.currentPlayer];
+  // Clickable only when: it's the human player's turn AND game is not busy
+  const isHumanTurn = cur && !cur.isRobo && !busy && alphaState && alphaState.initialBiddingDone;
+  document.querySelectorAll('.sl-clickable').forEach(g => {
+    g.style.pointerEvents = isHumanTurn ? 'all' : 'none';
+    g.style.cursor        = isHumanTurn ? 'pointer' : 'default';
+    // Dim when not your turn; slightly faded when bid already used this turn
+    if(!isHumanTurn){
+      g.style.opacity = '';
+    } else if(_turnBidUsed){
+      g.style.opacity = '0.55'; // still tappable for info, but visually dimmed
+    } else {
+      g.style.opacity = '1';
+    }
+  });
+}
+
+/* Attach hover tooltip and click handler to every sl-clickable group */
+function attachSlListeners(){
+  if(currentMode !== 'genalpha') return;
+  document.querySelectorAll('.sl-clickable').forEach(g => {
+    const type = g.dataset.slType;   // 'snake' | 'ladder'
+    const from = +g.dataset.slFrom;
+    const to   = +g.dataset.slTo;
+    const key  = `${type}_${from}`;
+
+    g.addEventListener('mouseenter', (e) => showSlTooltip(e, type, from, to, key));
+    g.addEventListener('mousemove',  (e) => moveSlTooltip(e));
+    g.addEventListener('mouseleave', ()  => hideSlTooltip());
+    g.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      showSlTooltip(e.touches[0], type, from, to, key);
+    }, {passive:false});
+    g.addEventListener('click', () => {
+      hideSlTooltip();
+      openInlineBidPanel(type, from, to, key);
+    });
+    g.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      hideSlTooltip();
+      openInlineBidPanel(type, from, to, key);
+    }, {passive:false});
+  });
+}
+
+/* ── Tooltip ── */
+let _ttVisible = false;
+function showSlTooltip(e, type, from, to, key){
+  if(currentMode !== 'genalpha') return;
+  const bid = alphaState && alphaState.bids[key];
+  const tt = document.getElementById('sl-tooltip');
+  const isSnake = type === 'snake';
+
+  document.getElementById('sl-tt-type').textContent  = isSnake ? '🐍 SNAKE' : '🪜 LADDER';
+  document.getElementById('sl-tt-type').style.color  = isSnake ? '#ff3d71' : '#69ff47';
+  document.getElementById('sl-tt-cells').textContent = `${from} → ${to}`;
+
+  if(bid){
+    document.getElementById('sl-tt-price').textContent = `Floor: 💰${bid.currentPrice}`;
+    const winnerEl = document.getElementById('sl-tt-winner');
+    if(bid.winner){
+      // HIDDEN BIDDING: never reveal who controls it — only show "Controlled"
+      winnerEl.textContent = '🔒 Controlled';
+      winnerEl.style.background = 'rgba(105,255,71,0.1)';
+      winnerEl.style.color = '#69ff47';
+      winnerEl.style.border = '1px solid rgba(105,255,71,0.3)';
+    } else {
+      winnerEl.textContent = '⚪ Uncontrolled';
+      winnerEl.style.background = 'rgba(255,255,255,0.06)';
+      winnerEl.style.color = 'rgba(255,255,255,0.4)';
+      winnerEl.style.border = '1px solid rgba(255,255,255,0.1)';
+    }
+  }
+
+  const cur = state.players[state.currentPlayer];
+  const canBid = cur && !cur.isRobo && !busy;
+  let actionText = 'NOT YOUR TURN';
+  let actionColor = 'rgba(255,100,100,0.6)';
+  if(canBid){
+    if(_turnBidUsed){
+      actionText = 'BID USED THIS TURN';
+      actionColor = 'rgba(245,197,24,0.6)';
+    } else {
+      actionText = 'TAP TO BID';
+      actionColor = 'rgba(105,255,71,0.7)';
+    }
+  }
+  document.getElementById('sl-tt-action').textContent = actionText;
+  document.getElementById('sl-tt-action').style.color = actionColor;
+
+  moveSlTooltip(e);
+  tt.classList.add('show');
+  _ttVisible = true;
+}
+
+function moveSlTooltip(e){
+  const tt = document.getElementById('sl-tooltip');
+  if(!_ttVisible) return;
+  const x = (e.clientX || (e.touches && e.touches[0].clientX) || 0) + 14;
+  const y = (e.clientY || (e.touches && e.touches[0].clientY) || 0) - 10;
+  // Keep within viewport
+  const tw = tt.offsetWidth || 220;
+  const th = tt.offsetHeight || 120;
+  tt.style.left = Math.min(x, window.innerWidth - tw - 8) + 'px';
+  tt.style.top  = Math.max(8, Math.min(y, window.innerHeight - th - 8)) + 'px';
+}
+
+function hideSlTooltip(){
+  document.getElementById('sl-tooltip').classList.remove('show');
+  _ttVisible = false;
+}
+
+/* ── Inline Bid Panel ── */
+let _ibpKey  = null;
+let _ibpType = null;
+let _ibpFrom = null;
+let _ibpTo   = null;
+let _turnBidUsed = false; // one bid per turn restriction
+
+/* Reset bid-used flag at start of each turn — called from nextTurn() */
+function resetTurnBidFlag(){ _turnBidUsed = false; }
+
+function openInlineBidPanel(type, from, to, key){
+  if(currentMode !== 'genalpha') return;
+  if(busy) return;
+  const cur = state.players[state.currentPlayer];
+  if(!cur || cur.isRobo) return;
+  if(!alphaState || !alphaState.bids[key]) return;
+
+  // One bid per turn
+  if(_turnBidUsed){
+    showToast('⚠️ You can only bid on one item per turn!', '');
+    return;
+  }
+
+  _ibpKey = key; _ibpType = type; _ibpFrom = from; _ibpTo = to;
+  const bid = alphaState.bids[key];
+  const isSnake = type === 'snake';
+
+  document.getElementById('ibp-icon').textContent  = isSnake ? '🐍' : '🪜';
+  document.getElementById('ibp-title').textContent = `${isSnake ? 'Snake' : 'Ladder'} ${from}→${to}`;
+  document.getElementById('ibp-title').style.color = isSnake ? '#ff3d71' : '#69ff47';
+  document.getElementById('ibp-cells').textContent = isSnake
+    ? `Head: ${from} · Tail: ${to}`
+    : `Bottom: ${from} · Top: ${to}`;
+  document.getElementById('ibp-price-val').textContent = `💰 ${bid.currentPrice}`;
+  document.getElementById('ibp-balance').textContent   = `💰 ${cur.coins}`;
+
+  // Show controlled/uncontrolled — NEVER reveal who owns it (hidden bidding)
+  const winnerInfo = document.getElementById('ibp-winner-info');
+  if(bid.winner){
+    winnerInfo.style.display = '';
+    winnerInfo.innerHTML = `🔒 Currently <strong>Controlled</strong> · Raise the floor to take over · Floor: 💰${bid.currentPrice}`;
+  } else {
+    winnerInfo.style.display = '';
+    winnerInfo.innerHTML = `⚪ Currently <strong>Uncontrolled</strong> · Be the first to bid!`;
+    winnerInfo.style.borderColor = 'rgba(255,255,255,0.15)';
+    winnerInfo.style.color = 'rgba(255,255,255,0.55)';
+  }
+
+  document.getElementById('ibp-player-label').textContent = `${cur.name.toUpperCase()}'S BID`;
+  document.getElementById('ibp-player-label').style.color = cur.color;
+
+  const inp = document.getElementById('ibp-input');
+  inp.value = '';
+  inp.min   = bid.currentPrice;
+  inp.placeholder = `Min 💰${bid.currentPrice}`;
+
+  document.getElementById('inline-bid-panel').classList.add('show');
+  setTimeout(() => inp.focus(), 200);
+}
+
+function _closeInlineBidPanel(){
+  document.getElementById('inline-bid-panel').classList.remove('show');
+  _ibpKey = null;
+}
+
+function ibpSkip(){
+  _closeInlineBidPanel();
+}
+
+function ibpConfirm(){
+  if(!_ibpKey || !alphaState) return;
+  const bid = alphaState.bids[_ibpKey];
+  const cur = state.players[state.currentPlayer];
+  if(!bid || !cur) return;
+
+  const inp = document.getElementById('ibp-input');
+  const amount = parseInt(inp.value) || 0;
+
+  // Validate amount
+  if(amount <= 0){
+    showToast('❌ Enter a bid amount greater than 0', '');
+    return;
+  }
+  if(amount < bid.currentPrice){
+    showToast(`❌ Bid must be at least 💰${bid.currentPrice}`, '');
+    return;
+  }
+  if(amount > cur.coins){
+    showToast(`❌ Not enough coins! You have 💰${cur.coins}`, '');
+    return;
+  }
+
+  // Snapshot key before closing (panel clears _ibpKey)
+  const wonKey  = _ibpKey;
+  const wonType = _ibpType;
+  _closeInlineBidPanel();
+
+  // Mark turn bid as used — no more bids this turn
+  _turnBidUsed = true;
+
+  // Deduct coins from player immediately
+  cur.coins = Math.max(0, cur.coins - amount);
+  saveAllCoins({ ...loadAllCoins(), [cur.name]: cur.coins });
+
+  // Update bid state — player wins unconditionally (hidden auction, no counter-bids shown)
+  bid.winner       = cur.name;
+  bid.winnerBid    = amount;
+  bid.currentPrice = amount;
+  bid.biddingComplete = false; // winner still needs to choose behavior
+
+  renderPlayers();
+  updateAlphaRankHUD();
+  updateSlClickability();
+
+  // Open the keep/invert decide overlay privately
+  openDecideOverlay(bid, cur.name, (doInvert) => {
+    bid.inverted        = doInvert;
+    bid.biddingComplete = true;
+    const behaviorLabel = doInvert
+      ? (wonType === 'snake' ? 'acts as a 🪜 Ladder' : 'acts as a 🐍 Snake')
+      : (wonType === 'snake' ? 'acts as a 🐍 Snake'   : 'acts as a 🪜 Ladder');
+    showToast(`✅ Bid won! This ${wonType} now ${behaviorLabel}`, 'gold');
+    renderPlayers();
+    updateAlphaRankHUD();
+    updateSlClickability();
+  });
+}
+
+// Close inline bid panel on backdrop click
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('inline-bid-panel');
+  if(panel && e.target === panel) _closeInlineBidPanel();
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   INLINE BID — triggered mid-game when a player lands on an
+   uncontrolled snake/ladder. Collects one bid per human player
+   sequentially (pass-the-device style), then resolves.
+══════════════════════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════════════════════
    INIT — update reward preview on load
 ══════════════════════════════════════════════════════════════════ */
@@ -5387,6 +6151,48 @@ setTimeout(updateRewardPreview, 100);
       🚀 START GAME
     </button>
   </div>
+</div>
+
+<!-- ═══ INLINE BID PANEL (Gen Alpha — tap a snake/ladder during your turn) ═══ -->
+<div id="inline-bid-panel">
+  <div class="ibp-box">
+    <div class="ibp-handle"></div>
+    <div class="ibp-header">
+      <div class="ibp-icon" id="ibp-icon">🐍</div>
+      <div>
+        <div class="ibp-title" id="ibp-title">Snake 98→58</div>
+        <div class="ibp-cells" id="ibp-cells">Head: 98 · Tail: 58</div>
+      </div>
+    </div>
+    <div class="ibp-winner-info" id="ibp-winner-info" style="display:none;"></div>
+    <div class="ibp-player-label" id="ibp-player-label">YOUR BID (0 = skip)</div>
+    <div class="ibp-price-row">
+      <div>
+        <div class="ibp-price-label">FLOOR PRICE</div>
+        <div class="ibp-price-val" id="ibp-price-val">💰 30</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="ibp-price-label">YOUR BALANCE</div>
+        <div class="ibp-balance" id="ibp-balance">💰 200</div>
+      </div>
+    </div>
+    <div class="ibp-input-row">
+      <input type="number" id="ibp-input" class="ibp-input" min="0" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="ibp-btns">
+      <button class="ibp-skip-btn" onclick="ibpSkip()">SKIP</button>
+      <button class="ibp-bid-btn" onclick="ibpConfirm()">💰 PLACE BID</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SNAKE/LADDER TOOLTIP ═══ -->
+<div id="sl-tooltip">
+  <div class="sl-tt-type" id="sl-tt-type">🐍 SNAKE</div>
+  <div class="sl-tt-cells" id="sl-tt-cells">98 → 58</div>
+  <div class="sl-tt-price" id="sl-tt-price">Floor: 💰30</div>
+  <div class="sl-tt-winner" id="sl-tt-winner"></div>
+  <div class="sl-tt-action" id="sl-tt-action">TAP TO BID</div>
 </div>
 
 </body>
